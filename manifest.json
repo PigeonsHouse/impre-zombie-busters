@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "impre-zombie busters",
+  "version": "1.0.0",
+  "icons": {
+    "16": "public/icon16.png",
+    "48": "public/icon48.png",
+    "128": "public/icon128.png"
+  },
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "content_scripts": [
+    {
+        "matches": ["https://x.com/*"],
+        "js": ["src/content_scripts/main.ts"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "matches": [
+        "https://x.com/*"
+      ],
+      "resources": [
+        "**/*",
+        "*"
+      ],
+      "use_dynamic_url": true
+    }
+  ],
+  "action": {
+    "default_popup": "index.html"
+  }
+}
