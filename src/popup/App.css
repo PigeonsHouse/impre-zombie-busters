@@ -4,3 +4,74 @@
   height: 600px;
   overflow-y: auto;
 }
+
+.reset-button {
+  background-color: #ddd;
+  margin: 8px 0;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.user-row-container {
+  background-color: #ddd;
+  padding: 4px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.user-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 30px;
+}
+
+.username {
+  font-weight: bold;
+}
+
+.user-id {
+  color: #1da1f2;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.remove-button {
+  cursor: pointer;
+  background-color: #999;
+  color: white;
+  font-weight: bold;
+  height: 20px;
+  width: 20px;
+  text-align: center;
+  border-radius: 20px;
+}
+
+.user-row-bottom {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: space-between;
+}
+
+.tweet-link {
+  background-color: #999;
+  color: white;
+  border-radius: 8px;
+  padding: 0 4px;
+  cursor: pointer;
+}

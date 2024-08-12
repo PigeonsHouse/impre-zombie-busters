@@ -1,4 +1,4 @@
-type UserData = {
+export type UserData = {
     name?: string,
     contentId?: string,
     avatar?: string,
