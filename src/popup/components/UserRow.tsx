@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { InvisibleReasons, UserData } from '../../utils';
+import { Avatar, RemoveButton, TweetLink, UserId, UserInfo, Username, UserRowBottom, UserRowContainer, UserRowTop } from './UserRow.style';
 
 type UserRowProps = {
   id: string,
@@ -38,20 +39,20 @@ const UserRow: React.FC<UserRowProps> = ({id, userData}) => {
   }, [userData.contentId]);
 
   return (
-    <div className='user-row-container'>
-      <div className='user-row-top'>
-        <div className='user-info'>
-          <img src={userData.avatar} alt='' className='avatar' />
-          <div className='username'>{userData.name}</div>
-          <div className='user-id' onClick={jumpUserPage}>{id}</div>
-        </div>
-        <div className='remove-button' onClick={removeUser}>x</div>
-      </div>
-      <div className='user-row-bottom'>
+    <UserRowContainer>
+      <UserRowTop>
+        <UserInfo>
+          <Avatar src={userData.avatar} alt='' />
+          <Username>{userData.name}</Username>
+          <UserId onClick={jumpUserPage}>{id}</UserId>
+        </UserInfo>
+        <RemoveButton onClick={removeUser}>x</RemoveButton>
+      </UserRowTop>
+      <UserRowBottom>
         <div>原因: {getJapaneseReason(userData.reason)}</div>
-        <div onClick={jumpTweetPage} className='tweet-link'>該当のツイートを見る</div>
-      </div>
-    </div>
+        <TweetLink onClick={jumpTweetPage}>該当のツイートを見る</TweetLink>
+      </UserRowBottom>
+    </UserRowContainer>
   )
 };
 

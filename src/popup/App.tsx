@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { decodeUserDataList, INVISIBLE_USERS, InvisiBleUsers } from '../utils';
 import ResetButton from './components/ResetButton';
 import UserRow from './components/UserRow';
-import './App.css'
+import { AppContainer } from './App.style';
 
 function App() {
   const [data, setData] = useState<InvisiBleUsers>({});
@@ -19,10 +19,10 @@ function App() {
 
   // TODO: NGワード設定UIの作成
   return (
-    <div id='app'>
+    <AppContainer>
       <ResetButton resetUserData={resetUserData} />
       {Object.entries(data).reverse().map(([id, userData]) => <UserRow id={id} userData={userData} />)}
-    </div>
+    </AppContainer>
   )
 }
 

@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import { Button } from './ResetButton.style';
 
 type ResetButtonProps = {
   resetUserData: () => void,
@@ -13,7 +14,7 @@ const ResetButton: React.FC<ResetButtonProps> = ({
   }, [resetUserData]);
 
   return (
-    <div className='reset-button' onClick={allRemoveHandler}>非表示リストをリセットする</div>
+  <Button onClick={allRemoveHandler}>非表示リストをリセットする</Button>
   )
 };
 
