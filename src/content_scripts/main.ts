@@ -53,6 +53,8 @@ async function observerFunc() {
         // 非表示に追加済であればスキップ
         if (Object.keys(invisibleUsers).includes(userId)) continue;
 
+        // TODO: OKワードの実装
+
         // 非表示リストに追加するときにいる情報
         const userInfos = {
             userId,
