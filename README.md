@@ -1,50 +1,47 @@
-# React + TypeScript + Vite
+# インプレゾンビバスターズ
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![icon](./public/icon128.png)
 
-Currently, two official plugins are available:
+## これは何？
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Twitter(現X)を使用している際に大量に出てくる、不快なユーザを機械的に非表示にするChrome拡張機能です。
+非表示の対象に引っかかったユーザのIDを控えて、非表示対象ユーザを常に非表示にします。
+NGワードの設定や、非表示対象のユーザの確認ができるポップアップ機能もあります。
 
-## Expanding the ESLint configuration
+## 使い方
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+### パッケージをインストールする
 
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm ci
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### パッケージを作成する
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```bash
+npm run build
 ```
+
+上のコマンドを実行すると `dist/` というディレクトリが生成される。
+
+### 拡張機能を導入する
+
+`chrome://extensions/` にアクセスし、右上の「デベロッパーモード」をONにして、「パッケージ化されていない拡張機能を読み込む」から `dist/` フォルダを指定する。
+
+## 開発の環境構築
+
+### パッケージをインストールする(上でインストール済であれば飛ばす)
+
+```bash
+npm ci
+```
+
+### 開発環境を起動する
+
+```bash
+npm run dev
+```
+
+### 拡張機能を導入する(初回のみでOK)
+
+`chrome://extensions/` にアクセスし、右上の「デベロッパーモード」をONにして、「パッケージ化されていない拡張機能を読み込む」から `dist/` フォルダを指定する。
