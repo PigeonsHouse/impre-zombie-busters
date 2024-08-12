@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { InvisibleReasons, UserData } from '../../utils';
+import { InvisibleReasons, UserData } from '../../domains';
 import { Avatar, RemoveButton, TweetLink, UserId, UserInfo, Username, UserRowBottom, UserRowContainer, UserRowTop } from './UserRow.style';
 
 type UserRowProps = {

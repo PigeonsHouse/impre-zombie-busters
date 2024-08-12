@@ -1,7 +1,8 @@
-import { InvisibleReasons } from "../utils";
-import { addInvisibleUser, arabianFilter, continuousTweetFilter, devanagariFilter, ngWordTweetFilter, ngWordUserNameFilter, parrotingFilter, tooManyEmojiFilter, tooManyHashtagFilter } from "./filters";
-import { restoreInvisibleUsers, saveInvisibleUsers, sleep } from "./utils";
+import { restoreInvisibleUsers, saveInvisibleUsers } from "../chrome";
+import { InvisibleReasons } from "../domains";
 import { getStatusPageInfos, getTweetInfos, getTweets, getUserId, isDisablePage } from "./domController";
+import { addInvisibleUser, arabianFilter, continuousTweetFilter, devanagariFilter, ngWordTweetFilter, ngWordUserNameFilter, parrotingFilter, tooManyEmojiFilter, tooManyHashtagFilter } from "./filters";
+import { sleep } from "./utils";
 
 async function observerFunc() {
     // 非表示処理をしないページはスキップ

@@ -1,4 +1,4 @@
-import { InvisibleReasons, InvisiBleUsers } from "../utils";
+import { InvisibleReasons, InvisiBleUsers } from "../domains";
 
 export const tooManyEmojiFilter = (tweetText: string, tweetDom: HTMLElement|null) => {
     if (!tweetDom) return false;

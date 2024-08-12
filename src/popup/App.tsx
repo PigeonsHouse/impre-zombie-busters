@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { decodeUserDataList, INVISIBLE_USERS, InvisiBleUsers } from '../utils';
+import { decodeUserDataList } from '../chrome';
+import { INVISIBLE_USERS, InvisiBleUsers } from '../domains';
 import ResetButton from './components/ResetButton';
 import UserRow from './components/UserRow';
 import { AppContainer } from './App.style';
