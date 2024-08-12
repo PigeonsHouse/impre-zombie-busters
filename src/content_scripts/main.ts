@@ -1,5 +1,5 @@
-import { restoreInvisibleUsers, saveInvisibleUsers } from "../chrome";
-import { InvisibleReasons } from "../domains";
+import { getFromStorage, setStorage } from "../chrome";
+import { decodeUserDataList, encodeUserDataList, InvisibleReasons, StorageKey } from "../domains";
 import { getStatusPageInfos, getTweetInfos, getTweets, getUserId, isDisablePage } from "./domController";
 import { addInvisibleUser, arabianFilter, continuousTweetFilter, devanagariFilter, ngWordTweetFilter, ngWordUserNameFilter, parrotingFilter, tooManyEmojiFilter, tooManyHashtagFilter } from "./filters";
 import { sleep } from "./utils";
@@ -13,7 +13,7 @@ async function observerFunc() {
     await sleep(500);
 
     // ここでlocalStorageから非表示リストを取得する
-    const invisibleUsers = await restoreInvisibleUsers();
+    const invisibleUsers = decodeUserDataList(await getFromStorage(StorageKey.INVISIBLE_USERS));
 
     // 画面上からTweetのDOM一覧を取得する
     const tweets = getTweets();
@@ -110,6 +110,7 @@ async function observerFunc() {
 
         // TODO: 悪意のある引用リツイートを弾く
         // TODO: ユーザ説明文のNGワード
+        // TODO: アンカーリンクのNGワード
     }
 
     // 非表示対象のツイートを非表示にする
@@ -122,7 +123,7 @@ async function observerFunc() {
     }
 
     // ここで非表示リスト、NGワードの配列をlocalStorageに保存する
-    saveInvisibleUsers(invisibleUsers);
+    await setStorage(StorageKey.INVISIBLE_USERS, encodeUserDataList(invisibleUsers));
 }
 
 // DOMの変更を監視するObserverの作成・起動
