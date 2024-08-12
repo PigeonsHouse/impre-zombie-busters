@@ -12,6 +12,8 @@ export const InvisibleReasons = {
     NgWordUserName: 3,
     TooManyHashtag: 4,
     ContinuousTweet: 5,
+    Devanagari: 6,
+    Arabian: 7,
     Unknown: -1,
 } as const;
 export type InvisibleReasons = (typeof InvisibleReasons)[keyof typeof InvisibleReasons];

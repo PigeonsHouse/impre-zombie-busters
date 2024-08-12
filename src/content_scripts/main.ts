@@ -1,5 +1,5 @@
 import { InvisibleReasons } from "../utils";
-import { addInvisibleUser, continuousTweetFilter, ngWordTweetFilter, ngWordUserNameFilter, parrotingFilter, tooManyEmojiFilter, tooManyHashtagFilter } from "./filters";
+import { addInvisibleUser, arabianFilter, continuousTweetFilter, devanagariFilter, ngWordTweetFilter, ngWordUserNameFilter, parrotingFilter, tooManyEmojiFilter, tooManyHashtagFilter } from "./filters";
 import { restoreInvisibleUsers, saveInvisibleUsers, sleep } from "./utils";
 import { getStatusPageInfos, getTweetInfos, getTweets, getUserId, isDisablePage } from "./domController";
 
@@ -86,6 +86,16 @@ async function observerFunc() {
             addInvisibleUser(invisibleUsers, userInfos, InvisibleReasons.TooManyHashtag);
             continue;
         }
+        // デーヴァナーガリー文字
+        if (devanagariFilter(userName, tweetText)) {
+            addInvisibleUser(invisibleUsers, userInfos, InvisibleReasons.Devanagari);
+            continue;
+        }
+        // アラビア文字
+        if (arabianFilter(userName, tweetText)) {
+            addInvisibleUser(invisibleUsers, userInfos, InvisibleReasons.Arabian);
+            continue;
+        }
 
         if (isStatusPage) {
             // リプライの連投
@@ -96,7 +106,6 @@ async function observerFunc() {
         }
 
         // TODO: 悪意のある引用リツイートを弾く
-        // TODO: アラビア語、ヒンディー語がユーザ名、本文にある人を非表示にする
         // TODO: ユーザ説明文のNGワード
     }
 

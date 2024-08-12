@@ -22,6 +22,10 @@ const UserRow: React.FC<UserRowProps> = ({id, userData}) => {
         return 'NGワードを含むツイート'
       case InvisibleReasons.NgWordUserName:
         return 'NGワードを含むユーザ名'
+      case InvisibleReasons.Devanagari:
+        return 'ヒンディー語を含むユーザ・投稿'
+      case InvisibleReasons.Arabian:
+        return 'アラビア語を含むユーザ・投稿'
     }
   }, []);
 
@@ -50,7 +54,7 @@ const UserRow: React.FC<UserRowProps> = ({id, userData}) => {
       </UserRowTop>
       <UserRowBottom>
         <div>原因: {getJapaneseReason(userData.reason)}</div>
-        <TweetLink onClick={jumpTweetPage}>該当のツイートを見る</TweetLink>
+        <TweetLink onClick={jumpTweetPage}>該当の投稿を見る</TweetLink>
       </UserRowBottom>
     </UserRowContainer>
   )

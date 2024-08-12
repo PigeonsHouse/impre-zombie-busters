@@ -1,6 +1,6 @@
 import { InvisibleReasons, InvisiBleUsers } from "../utils";
 
-export const tooManyEmojiFilter = (tweetText: string, tweetDom: HTMLElement|null): boolean => {
+export const tooManyEmojiFilter = (tweetText: string, tweetDom: HTMLElement|null) => {
     if (!tweetDom) return false;
 
     let emojiCounter = 0;
@@ -49,6 +49,17 @@ export const continuousTweetFilter = (userId: string, replyUserIdList: string[])
     if (replyUserIdList.includes(userId)) return true;
     replyUserIdList.push(userId);
     return false;
+}
+
+export const devanagariFilter = (userName: string, tweetText: string) => {
+    const regex = /[\u0900-\u097F]/;
+    return regex.test(userName) || regex.test(tweetText);
+
+}
+
+export const arabianFilter = (userName: string, tweetText: string) => {
+    const regex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
+    return regex.test(userName) || regex.test(tweetText);
 }
 
 type UserInfos = {
