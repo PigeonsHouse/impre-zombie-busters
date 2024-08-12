@@ -1,14 +1,6 @@
 import { InvisibleReasons, InvisiBleUsers } from "../utils";
 
-export type UserInfos = {
-    userId: string;
-    userName: string;
-    contentId: string;
-    avatar: string;
-    tweetText: string;
-}
-
-export const tooManyEmojiFilter = (invisibleUsers: InvisiBleUsers, userInfos: UserInfos, tweetDom: HTMLElement|null): boolean => {
+export const tooManyEmojiFilter = (tweetText: string, tweetDom: HTMLElement|null): boolean => {
     if (!tweetDom) return false;
 
     let emojiCounter = 0;
@@ -18,93 +10,59 @@ export const tooManyEmojiFilter = (invisibleUsers: InvisiBleUsers, userInfos: Us
             emojiCounter++;
         }
     }
-    if (userInfos.tweetText.length <= emojiCounter) {
-        invisibleUsers[userInfos.userId] = {
-            name: userInfos.userName,
-            avatar: userInfos.avatar,
-            contentId: userInfos.contentId,
-            reason: InvisibleReasons.TooManyEmoji,
-        };
-        return true;
-    }
+    return tweetText.length <= emojiCounter;
+};
+
+export const parrotingFilter = (tweetText: string, tweetTextList: string[]) => {
+    if (tweetTextList.includes(tweetText)) return true;
+    tweetTextList.push(tweetText);
     return false;
 };
 
-export const parrotingFilter = (invisibleUsers: InvisiBleUsers, userInfos: UserInfos, tweetTextList: string[]) => {
-    if (tweetTextList.includes(userInfos.tweetText)) {
-        invisibleUsers[userInfos.userId] = {
-            name: userInfos.userName,
-            avatar: userInfos.avatar,
-            contentId: userInfos.contentId,
-            reason: InvisibleReasons.Parroting,
-        };
-        return true;
-    }
-    tweetTextList.push(userInfos.tweetText);
-    return false;
-};
-
-export const ngWordTweet = (invisibleUsers: InvisiBleUsers, userInfos: UserInfos) => {
+export const ngWordTweetFilter = (tweetText: string) => {
     // TODO: ここをchrome.storage.localから取得する
     const ngWords: string[] = [];
     for (const ngWord of ngWords) {
-        if (userInfos.tweetText.includes(ngWord)) {
-            invisibleUsers[userInfos.userId] = {
-                name: userInfos.userName,
-                avatar: userInfos.avatar,
-                contentId: userInfos.contentId,
-                reason: InvisibleReasons.NgWordTweet,
-            };
-            return true;
-        }
+        if (tweetText.includes(ngWord)) return true;
     }
     return false;
 };
 
-export const ngWordUserName = (invisibleUsers: InvisiBleUsers, userInfos: UserInfos) => {
+export const ngWordUserNameFilter = (userName: string) => {
     // TODO: ここをchrome.storage.localから取得する
     const ngWords: string[] = [];
     for (const ngWord of ngWords) {
-        if (userInfos.userName.includes(ngWord)) {
-            invisibleUsers[userInfos.userId] = {
-                name: userInfos.userName,
-                avatar: userInfos.avatar,
-                contentId: userInfos.contentId,
-                reason: InvisibleReasons.NgWordUserName,
-            };
-            return true;
-        }
+        if (userName.includes(ngWord)) return true;
     }
     return false;
 };
 
-export const tooManyHashtagFilter = (invisibleUsers: InvisiBleUsers, userInfos: UserInfos, isStatusPage: boolean) => {
-    const hashCount = userInfos.tweetText.match(/#/g);
-    if (hashCount) {
-        const rateHashCount = isStatusPage ? 2 : 4;
-        if (hashCount.length >= rateHashCount) {
-            invisibleUsers[userInfos.userId] = {
-                name: userInfos.userName,
-                avatar: userInfos.avatar,
-                contentId: userInfos.contentId,
-                reason: InvisibleReasons.TooManyHashtag,
-            };
-            return true;
-        }
-    }
+export const tooManyHashtagFilter = (tweetText: string, isStatusPage: boolean) => {
+    const hashCount = tweetText.match(/#/g);
+    if (!hashCount) return false;
+
+    const rateHashCount = isStatusPage ? 2 : 4;
+    return hashCount.length >= rateHashCount;
+}
+
+export const continuousTweetFilter = (userId: string, replyUserIdList: string[]) => {
+    if (replyUserIdList.includes(userId)) return true;
+    replyUserIdList.push(userId);
     return false;
 }
 
-export const continuousTweetFilter = (invisibleUsers: InvisiBleUsers, userInfos: UserInfos, replyUserIdList: string[]) => {
-    if (replyUserIdList.includes(userInfos.userId)) {
-        invisibleUsers[userInfos.userId] = {
-            name: userInfos.userName,
-            avatar: userInfos.avatar,
-            contentId: userInfos.contentId,
-            reason: InvisibleReasons.ContinuousTweet,
-        };
-        return true;
-    }
-    replyUserIdList.push(userInfos.userId);
-    return false;
-}
+type UserInfos = {
+    userId: string;
+    userName: string;
+    avatar: string;
+    contentId: string;
+};
+
+export const addInvisibleUser = (invisibleUsers: InvisiBleUsers, userInfos: UserInfos, reason: InvisibleReasons) => {
+    invisibleUsers[userInfos.userId] = {
+        name: userInfos.userName,
+        avatar: userInfos.avatar,
+        contentId: userInfos.contentId,
+        reason,
+    };
+};
