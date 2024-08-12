@@ -47,7 +47,7 @@ export const decodeUserDataList = (data: string|null): InvisiBleUsers => {
                 break;
             }
         }
-        
+
         decodedData[id] = {
             name,
             contentId,

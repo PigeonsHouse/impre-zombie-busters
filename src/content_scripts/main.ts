@@ -54,7 +54,7 @@ async function main() {
                 }
                 if (userId === focussedTweetUserId) continue;
                 if (Object.keys(invisibleUsers).includes(userId)) continue;
-                
+
                 // TODO: 非表示処理のON/OFF機能
                 const tweetText = tweetDom.textContent;
 
@@ -145,7 +145,7 @@ async function main() {
                         replyUserIdList.push(userId);
                     }
                 }
-                
+
                 // TODO: 悪意のある引用リツイートを弾く
                 // TODO: アラビア語、ヒンディー語がユーザ名、本文にある人を非表示にする
                 // TODO: ユーザ説明文のNGワード
