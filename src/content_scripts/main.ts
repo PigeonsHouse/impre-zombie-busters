@@ -19,11 +19,12 @@ async function main() {
     const ngWordsForTweet: string[] = [];
 
     const observer = new MutationObserver(async () => {
+        // 0.3秒待機
+        await sleep(300);
+
         // ここでlocalStorageから非表示リスト、NGワードの配列を取得する
         const userDataString: string = (await chrome.storage.local.get(INVISIBLE_USERS))[INVISIBLE_USERS];
         invisibleUsers = decodeUserDataList(userDataString);
-
-        await sleep(300);
 
         const tweets: NodeListOf<HTMLElement> = document.querySelectorAll('[data-testid="tweet"]');
         if (tweetCount === tweets.length) return;
@@ -55,25 +56,26 @@ async function main() {
                 if (Object.keys(invisibleUsers).includes(userId)) continue;
                 
                 // TODO: 非表示処理のON/OFF機能
-                // 絵文字しか含まれていないツイートは非表示
-                let isOnlyEmoji = true;
+                const tweetText = tweetDom.textContent;
+
+                // 絵文字が半分以上を占めているツイートは非表示
+                let emojiCounter = 0;
+                const tweetCharCounter = tweetText !== null ? tweetText.length : 0; 
                 for (const child of tweetDom.children) {
                     if (!(child instanceof HTMLElement)) continue;
-                    if (child.tagName !== 'IMG') {
-                        isOnlyEmoji = false;
-                        break;
+                    if (child.tagName === 'IMG') {
+                        emojiCounter++;
                     }
                 }
-                if (isOnlyEmoji) {
+                if (tweetCharCounter <= emojiCounter) {
                     invisibleUsers[userId] = {
                         name: userName,
                         avatar: avatar,
                         contentId: contentId,
-                        reason: InvisibleReasons.EmojiOnly,
+                        reason: InvisibleReasons.TooManyEmoji,
                     };
                 }
 
-                const tweetText = tweetDom.textContent;
                 if (tweetText) {
                     // だれかのツイートを丸々コピペしてるやつは非表示
                     if (tweetTextList.includes(tweetText)) {

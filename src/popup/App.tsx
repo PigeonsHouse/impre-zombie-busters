@@ -13,8 +13,8 @@ function App() {
 
   const getJapaneseReason = (reason: InvisibleReasons) => {
     switch (reason) {
-      case InvisibleReasons.EmojiOnly:
-        return '絵文字のみのツイート'
+      case InvisibleReasons.TooManyEmoji:
+        return '絵文字の多いツイート'
       case InvisibleReasons.Parroting:
         return 'コピペツイート'
       case InvisibleReasons.TooManyHashtag:
@@ -38,7 +38,7 @@ function App() {
         chrome.storage.local.set({invisibleUsers: ""});
         setData({});
       }} style={{backgroundColor: '#ddd'}}>全部消す</p>
-      {Object.entries(data).map(([id, userData]) => {
+      {Object.entries(data).reverse().map(([id, userData]) => {
         return (
           <p style={{backgroundColor: '#ddd', padding: '4px 8px', display: 'flex', flexDirection: 'column', gap: '4px', borderRadius: '4px'}}>
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>

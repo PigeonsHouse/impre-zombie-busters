@@ -6,13 +6,13 @@ type UserData = {
 }
 
 export const InvisibleReasons = {
-    EmojiOnly: 'emoji only',
-    Parroting: 'parroting',
-    NgWordTweet: 'ng word tweet',
-    NgWordUserName: 'ng word user name',
-    TooManyHashtag: 'too many hashtag',
-    ContinuousTweet: 'continuous tweet',
-    Unknown: 'unknown',
+    TooManyEmoji: 0,
+    Parroting: 1,
+    NgWordTweet: 2,
+    NgWordUserName: 3,
+    TooManyHashtag: 4,
+    ContinuousTweet: 5,
+    Unknown: -1,
 } as const;
 export type InvisibleReasons = (typeof InvisibleReasons)[keyof typeof InvisibleReasons];
 
@@ -40,8 +40,9 @@ export const decodeUserDataList = (data: string|null): InvisiBleUsers => {
         const contentId = singleUserDatum[2] !== " " ? singleUserDatum[2] : undefined;
         const avatar = singleUserDatum[3] !== " " ? singleUserDatum[3] : undefined;
         let reason: InvisibleReasons = InvisibleReasons.Unknown;
+        const reasonNumber = Number(singleUserDatum[4]);
         for (const value of Object.values(InvisibleReasons)) {
-            if (value === singleUserDatum[4]) {
+            if (value === reasonNumber) {
                 reason = value;
                 break;
             }
