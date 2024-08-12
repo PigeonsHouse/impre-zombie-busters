@@ -1,107 +1,123 @@
 import { InvisibleReasons } from "../utils";
 import { addInvisibleUser, continuousTweetFilter, ngWordTweetFilter, ngWordUserNameFilter, parrotingFilter, tooManyEmojiFilter, tooManyHashtagFilter } from "./filters";
-import { getStatusPageInfos, getTweetInfos, getTweets, getUserId, isDisablePage, restoreInvisibleUsers, saveInvisibleUsers, sleep } from "./utils";
+import { restoreInvisibleUsers, saveInvisibleUsers, sleep } from "./utils";
+import { getStatusPageInfos, getTweetInfos, getTweets, getUserId, isDisablePage } from "./domController";
 
-async function main() {
-    const observer = new MutationObserver(async () => {
-        // 0.5秒待機
-        // WHY: DOM生成が間に合わない場合があり、一部DOMから情報を取得するのに失敗するので、少し待つだけでも挙動の安定性が上がるため
-        await sleep(500);
+async function observerFunc() {
+    // 非表示処理をしないページはスキップ
+    if (isDisablePage()) return;
 
-        // ここでlocalStorageから非表示リストを取得する
-        const invisibleUsers = await restoreInvisibleUsers();
+    // 0.5秒待機
+    // WHY: DOM生成が間に合わない場合があり、一部DOMから情報を取得するのに失敗するので、少し待つだけでも挙動の安定性が上がるため
+    await sleep(500);
 
-        // 画面上からTweetのDOM一覧を取得する
-        const tweets = getTweets();
-        if (tweets.length <= 0) return;
-        if (isDisablePage()) return;
+    // ここでlocalStorageから非表示リストを取得する
+    const invisibleUsers = await restoreInvisibleUsers();
 
-        const tweetTextList: string[] = [];
+    // 画面上からTweetのDOM一覧を取得する
+    const tweets = getTweets();
+    if (tweets.length <= 0) return;
 
+    // 同一の文のツイートか判断するため本文を保持する配列を用意
+    const tweetTextList: string[] = [];
+    // statusページ特有の情報を取得する
+    const {
+        isStatusPage,
+        focussedTweet,
+        focussedTweetUserId,
+    } = getStatusPageInfos();
+    let isAfterFocusedTweet = !isStatusPage;
+    const replyUserIdList: string[] = [];
+
+    // 各TweetのDOMから非表示にすべきか判定
+    for (const tweet of tweets) {
+        // tweetのDOMから取れる情報を取得
         const {
-            isStatusPage,
-            focussedTweet,
-            focussedTweetUserId,
-        } = getStatusPageInfos();
-        let isAfterFocusedTweet = !isStatusPage;
-        const replyUserIdList: string[] = [];
+            userId,
+            userName,
+            contentId,
+            avatar,
+            tweetDom,
+            tweetText
+        } = getTweetInfos(tweet);
+        // 取得に失敗したら無視
+        if (!userId || !userName || !contentId || !avatar || !tweetDom) continue;
+        // リプライツリーの途中などを見ているときは、ページの対象のツイートより下のツイートだけ検閲する
+        if (!isAfterFocusedTweet) {
+            if (tweet === focussedTweet) isAfterFocusedTweet = true;
+            continue;
+        }
+        // ページの対象のツイート主がリプライ欄にいるとき、非表示対象にしない
+        if (userId === focussedTweetUserId) continue;
+        // 非表示に追加済であればスキップ
+        if (Object.keys(invisibleUsers).includes(userId)) continue;
 
-        for (const tweet of tweets) {
-            const {
-                userId,
-                userName,
-                contentId,
-                avatar,
-                tweetDom,
-                tweetText
-            } = getTweetInfos(tweet);
-            if (!userId || !userName || !contentId || !avatar || !tweetDom) continue;
-            if (!isAfterFocusedTweet) {
-                if (tweet === focussedTweet) isAfterFocusedTweet = true;
-                continue;
-            }
-            if (userId === focussedTweetUserId) continue;
-            if (Object.keys(invisibleUsers).includes(userId)) continue;
+        // 非表示リストに追加するときにいる情報
+        const userInfos = {
+            userId,
+            userName,
+            avatar,
+            contentId,
+        };
 
-            const userInfos = {
-                userId,
-                userName,
-                avatar,
-                contentId,
-            };
-
-            // TODO: 非表示処理のON/OFF機能
-            if (tooManyEmojiFilter(tweetText, tweetDom)) {
-                addInvisibleUser(invisibleUsers, userInfos, InvisibleReasons.TooManyEmoji);
-                continue;
-            }
-            if (parrotingFilter(tweetText, tweetTextList)) {
-                addInvisibleUser(invisibleUsers, userInfos, InvisibleReasons.Parroting);
-                continue;
-            }
-            if (ngWordTweetFilter(tweetText)) {
-                addInvisibleUser(invisibleUsers, userInfos, InvisibleReasons.NgWordTweet);
-                continue;
-            }
-            if (ngWordUserNameFilter(userName)) {
-                addInvisibleUser(invisibleUsers, userInfos, InvisibleReasons.NgWordUserName);
-                continue;
-            }
-            if (tooManyHashtagFilter(tweetText, isStatusPage)) {
-                addInvisibleUser(invisibleUsers, userInfos, InvisibleReasons.TooManyHashtag);
-                continue;
-            }
-
-            if (isStatusPage) {
-                if (continuousTweetFilter(userId, replyUserIdList)) {
-                    addInvisibleUser(invisibleUsers, userInfos, InvisibleReasons.ContinuousTweet);
-                    continue;
-                }
-            }
-
-            // TODO: 悪意のある引用リツイートを弾く
-            // TODO: アラビア語、ヒンディー語がユーザ名、本文にある人を非表示にする
-            // TODO: ユーザ説明文のNGワード
+        // TODO: 非表示処理のON/OFF機能
+        // 絵文字の多いツイート
+        if (tooManyEmojiFilter(tweetText, tweetDom)) {
+            addInvisibleUser(invisibleUsers, userInfos, InvisibleReasons.TooManyEmoji);
+            continue;
+        }
+        // コピペツイート
+        if (parrotingFilter(tweetText, tweetTextList)) {
+            addInvisibleUser(invisibleUsers, userInfos, InvisibleReasons.Parroting);
+            continue;
+        }
+        // NGワードを含むツイート
+        if (ngWordTweetFilter(tweetText)) {
+            addInvisibleUser(invisibleUsers, userInfos, InvisibleReasons.NgWordTweet);
+            continue;
+        }
+        // NGワードを含むユーザ名
+        if (ngWordUserNameFilter(userName)) {
+            addInvisibleUser(invisibleUsers, userInfos, InvisibleReasons.NgWordUserName);
+            continue;
+        }
+        // 多すぎるハッシュタグ
+        if (tooManyHashtagFilter(tweetText, isStatusPage)) {
+            addInvisibleUser(invisibleUsers, userInfos, InvisibleReasons.TooManyHashtag);
+            continue;
         }
 
-        // 非表示対象のツイートを非表示にする
-        for (const tweet of tweets) {
-            const userId = getUserId(tweet);
-            if (!userId) continue;
-            if (Object.keys(invisibleUsers).includes(userId)) {
-                tweet.style.display = 'none';
-            };
+        if (isStatusPage) {
+            // リプライの連投
+            if (continuousTweetFilter(userId, replyUserIdList)) {
+                addInvisibleUser(invisibleUsers, userInfos, InvisibleReasons.ContinuousTweet);
+                continue;
+            }
         }
 
-        // ここで非表示リスト、NGワードの配列をlocalStorageに保存する
-        saveInvisibleUsers(invisibleUsers);
-    })
-    observer.observe(document.body, {
-        childList: true,
-        attributes: true,
-        characterData: true,
-        subtree: true,
-    });
+        // TODO: 悪意のある引用リツイートを弾く
+        // TODO: アラビア語、ヒンディー語がユーザ名、本文にある人を非表示にする
+        // TODO: ユーザ説明文のNGワード
+    }
+
+    // 非表示対象のツイートを非表示にする
+    for (const tweet of tweets) {
+        const userId = getUserId(tweet);
+        if (!userId) continue;
+        if (Object.keys(invisibleUsers).includes(userId)) {
+            tweet.style.display = 'none';
+        };
+    }
+
+    // ここで非表示リスト、NGワードの配列をlocalStorageに保存する
+    saveInvisibleUsers(invisibleUsers);
 }
 
-main();
+// DOMの変更を監視するObserverの作成・起動
+const observer = new MutationObserver(observerFunc);
+observer.observe(document.body, {
+    childList: true,
+    attributes: true,
+    characterData: true,
+    subtree: true,
+});
