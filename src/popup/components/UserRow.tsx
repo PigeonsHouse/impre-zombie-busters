@@ -50,6 +50,7 @@ const UserRow: React.FC<UserRowProps> = ({id, userData}) => {
       </UserRowTop>
       <UserRowBottom>
         <div>原因: {getJapaneseReason(userData.reason)}</div>
+        {/* TODO: 該当のツイートは非表示になるので、見れるように工夫する */}
         <TweetLink onClick={jumpTweetPage}>該当のツイートを見る</TweetLink>
       </UserRowBottom>
     </UserRowContainer>
