@@ -1,17 +1,20 @@
-import { useCallback, useEffect, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { getFromStorage, setStorage } from '../chrome';
 import { decodeUserDataList, encodeUserDataList, InvisiBleUsers, StorageKey } from '../domains';
-import ResetButton from './components/ResetButton';
-import UserRow from './components/UserRow';
 import { AppContainer } from './App.style';
+import NgWordEditor from './components/NgWordEditor';
+import UserList from './components/UserList';
 
 function App() {
   const [data, setData] = useState<InvisiBleUsers>({});
+  const [ngWordTweet, setNgWordTweet] = useState('');
+  const [ngWordUsername, setNgWordUsername] = useState('');
 
   useEffect(() => {
     (async () => {
-      const usersString = await getFromStorage(StorageKey.INVISIBLE_USERS);
-      setData(decodeUserDataList(usersString));
+      setData(decodeUserDataList(await getFromStorage(StorageKey.INVISIBLE_USERS)));
+      setNgWordTweet((await getFromStorage(StorageKey.NG_WORD_TWEET)) || '');
+      setNgWordUsername((await getFromStorage(StorageKey.NG_WORD_USERNAME)) || '');
     })();
   }, []);
 
@@ -31,13 +34,27 @@ function App() {
     })();
   }, [data, setData]);
 
-  // TODO: NGワード設定UIの作成
+  const ngWordTweetChangeHandler = useCallback((e: ChangeEvent<HTMLTextAreaElement>) => {
+    setNgWordTweet(e.target.value);
+  }, []);
+
+  const saveNgWordTweetHandler = useCallback(async () => {
+    await setStorage(StorageKey.NG_WORD_TWEET, ngWordTweet);
+  }, [ngWordTweet]);
+
+  const ngWordUsernameChangeHandler = useCallback((e: ChangeEvent<HTMLTextAreaElement>) => {
+    setNgWordUsername(e.target.value);
+  }, []);
+
+  const saveNgWordUsernameHandler = useCallback(async () => {
+    await setStorage(StorageKey.NG_WORD_USERNAME, ngWordUsername);
+  }, [ngWordUsername]);
+
   return (
     <AppContainer>
-      <ResetButton resetUserData={resetUserData} />
-      {Object.entries(data).reverse().map(([id, userData]) => {
-        return <UserRow id={id} userData={userData} removeUser={removeUser} />
-      })}
+      <NgWordEditor title='本文のNGワード' ngWords={ngWordTweet} onChangeNgWords={ngWordTweetChangeHandler} saveNgWords={saveNgWordTweetHandler} />
+      <NgWordEditor title='ユーザ名のNGワード' ngWords={ngWordUsername} onChangeNgWords={ngWordUsernameChangeHandler} saveNgWords={saveNgWordUsernameHandler} />
+      <UserList resetUserData={resetUserData} data={data} removeUser={removeUser} />
     </AppContainer>
   )
 }

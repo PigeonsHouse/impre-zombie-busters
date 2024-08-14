@@ -41,13 +41,13 @@ async function observerFunc() {
             tweetDom,
             tweetText
         } = getTweetInfos(tweet);
-        // 取得に失敗したら無視
-        if (!userId || !userName || !contentId || !avatar || !tweetDom) continue;
         // リプライツリーの途中などを見ているときは、ページの対象のツイートより下のツイートだけ検閲する
         if (!isAfterFocusedTweet) {
             if (tweet === focussedTweet) isAfterFocusedTweet = true;
             continue;
         }
+        // 取得に失敗したら無視
+        if (!userId || !userName || !contentId || !avatar) continue;
         // ページの対象のツイート主がリプライ欄にいるとき、非表示対象にしない
         if (userId === focussedTweetUserId) continue;
         // 非表示に追加済であればスキップ
@@ -75,20 +75,22 @@ async function observerFunc() {
             continue;
         }
         // NGワードを含むツイート
-        if (ngWordTweetFilter(tweetText)) {
+        if (await ngWordTweetFilter(tweetText)) {
             addInvisibleUser(invisibleUsers, userInfos, InvisibleReasons.NgWordTweet);
             continue;
         }
         // NGワードを含むユーザ名
-        if (ngWordUserNameFilter(userName)) {
+        if (await ngWordUserNameFilter(userName)) {
             addInvisibleUser(invisibleUsers, userInfos, InvisibleReasons.NgWordUserName);
             continue;
         }
+        // TODO: ハッシュタグのレート値の調整機能
         // 多すぎるハッシュタグ
         if (tooManyHashtagFilter(tweetText, isStatusPage)) {
             addInvisibleUser(invisibleUsers, userInfos, InvisibleReasons.TooManyHashtag);
             continue;
         }
+        // TODO: └(՞ةڼ◔)」など絵文字の誤検知の対応
         // デーヴァナーガリー文字
         if (devanagariFilter(userName, tweetText)) {
             addInvisibleUser(invisibleUsers, userInfos, InvisibleReasons.Devanagari);
@@ -114,6 +116,7 @@ async function observerFunc() {
     }
 
     // 非表示対象のツイートを非表示にする
+    // TODO: classを付与しておいて、for2周をせずdisplay: noneするようにする
     for (const tweet of tweets) {
         const userId = getUserId(tweet);
         if (!userId) continue;
@@ -130,7 +133,5 @@ async function observerFunc() {
 const observer = new MutationObserver(observerFunc);
 observer.observe(document.body, {
     childList: true,
-    attributes: true,
-    characterData: true,
     subtree: true,
 });

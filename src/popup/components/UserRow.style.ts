@@ -59,7 +59,7 @@ export const UserRowBottom = styled.div`
 export const TweetLink = styled.div`
   background-color: #999;
   color: white;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 0 4px;
   cursor: pointer;
 `;

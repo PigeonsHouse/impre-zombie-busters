@@ -35,10 +35,19 @@ export type InvisiBleUsers = {
     [key: string]: UserData,
 };
 
+export const encodeNgWords = (ngWords: string[]): string => {
+    return ngWords.join('\n');
+}
+
+export const decodeNgWords = (ngWordString: string|undefined): string[] => {
+    if (ngWordString === undefined) return [];
+    return ngWordString.split('\n');
+}
+
 export const encodeUserDataList = (data: InvisiBleUsers): string => {
     let encodedString = '';
     for (const [key, value] of Object.entries(data)) {
-        encodedString += `${key}###${value.name}###${value.contentId}###${value.avatar}###${value.reason}####`;
+        encodedString += `${key}\n${value.name}\n${value.contentId}\n${value.avatar}\n${value.reason}\n\n`;
     }
     return encodedString;
 };
@@ -46,10 +55,10 @@ export const encodeUserDataList = (data: InvisiBleUsers): string => {
 export const decodeUserDataList = (data: string|undefined): InvisiBleUsers => {
     const decodedData: InvisiBleUsers = {};
     if (data === undefined) return decodedData;
-    const splittedData = data.split('####');
+    const splittedData = data.split('\n\n');
     for (const singleUserData of splittedData) {
         if (singleUserData === '') continue;
-        const singleUserDatum = singleUserData.split("###");
+        const singleUserDatum = singleUserData.split("\n");
         const id = singleUserDatum[0];
         const reasonNumber = Number(singleUserDatum[4]);
         let reason: InvisibleReasons = InvisibleReasons.Unknown;

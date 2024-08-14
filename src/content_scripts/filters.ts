@@ -1,4 +1,5 @@
-import { InvisibleReasons, InvisiBleUsers } from "../domains";
+import { getFromStorage } from "../chrome";
+import { decodeNgWords, InvisibleReasons, InvisiBleUsers, StorageKey } from "../domains";
 
 export const tooManyEmojiFilter = (tweetText: string, tweetDom: HTMLElement|null) => {
     if (!tweetDom) return false;
@@ -10,7 +11,7 @@ export const tooManyEmojiFilter = (tweetText: string, tweetDom: HTMLElement|null
             emojiCounter++;
         }
     }
-    return tweetText.length <= emojiCounter;
+    return emojiCounter > 0 && tweetText.length <= emojiCounter;
 };
 
 export const parrotingFilter = (tweetText: string, tweetTextList: string[]) => {
@@ -19,19 +20,19 @@ export const parrotingFilter = (tweetText: string, tweetTextList: string[]) => {
     return false;
 };
 
-export const ngWordTweetFilter = (tweetText: string) => {
-    // TODO: ここをchrome.storage.localから取得する
-    const ngWords: string[] = [];
+export const ngWordTweetFilter = async (tweetText: string) => {
+    const ngWords = decodeNgWords(await getFromStorage(StorageKey.NG_WORD_TWEET));
     for (const ngWord of ngWords) {
+        if (ngWord === '') continue;
         if (tweetText.includes(ngWord)) return true;
     }
     return false;
 };
 
-export const ngWordUserNameFilter = (userName: string) => {
-    // TODO: ここをchrome.storage.localから取得する
-    const ngWords: string[] = [];
+export const ngWordUserNameFilter = async (userName: string) => {
+    const ngWords = decodeNgWords(await getFromStorage(StorageKey.NG_WORD_USERNAME));
     for (const ngWord of ngWords) {
+        if (ngWord === '') continue;
         if (userName.includes(ngWord)) return true;
     }
     return false;
