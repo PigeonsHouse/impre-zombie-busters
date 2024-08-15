@@ -36,6 +36,7 @@ export type InvisiBleUsers = {
     [key: string]: UserData;
 };
 
+// encoder, decoderの処理
 export const encodeNgWords = (ngWords: string[]): string => {
     return ngWords.join("\n");
 };
