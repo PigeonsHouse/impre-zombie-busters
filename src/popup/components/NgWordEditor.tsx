@@ -1,12 +1,12 @@
 import type React from "react";
 import type { ChangeEvent } from "react";
 import {
+  Button,
   ButtonWrapper,
   Container,
   InputBox,
   Title,
 } from "./NgWordEditor.style";
-import { Button } from "./NgWordEditor.style";
 
 type NgWordEditorProps = {
   title: string;
