@@ -1,6 +1,6 @@
 import type React from "react";
 import type { InvisiBleUsers } from "../../domains";
-import { ResetButton, Title } from "./UserList.style";
+import { Header, ResetButton, Title, TitleWrapper } from "./UserList.style";
 import UserRow from "./UserRow";
 
 type UserListProps = {
@@ -16,10 +16,13 @@ const UserList: React.FC<UserListProps> = ({
 }) => {
   return (
     <>
-      <Title>
-        <div>非表示ユーザリスト</div>
+      <Header>
+        <TitleWrapper>
+          <Title>非表示ユーザリスト</Title>
+          <div>({Object.keys(data).length}人)</div>
+        </TitleWrapper>
         <ResetButton onClick={resetUserData}>リセットする</ResetButton>
-      </Title>
+      </Header>
       {Object.entries(data)
         .reverse()
         .map(([id, userData]) => {
