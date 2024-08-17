@@ -1,6 +1,7 @@
 name: Release Chrome Extension
 
 on:
+  workflow_dispatch:
   push:
     branches:
     - main
