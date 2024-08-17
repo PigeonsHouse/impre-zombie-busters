@@ -1,3 +1,4 @@
+import { attributeName } from "../domains";
 import { sleep } from "./utils";
 
 // 0.5秒ごとに30回まで取得に挑戦する
@@ -149,4 +150,13 @@ export const isPromotionTweet = (tweet: HTMLElement) => {
         lastColumnChildren[0].tagName === "svg" &&
         lastColumnChildren[1].tagName === "DIV"
     );
+};
+
+export const hideUser = (userId: string) => {
+    const elements = document.querySelectorAll(
+        `[${attributeName}="${userId}"]`,
+    ) as NodeListOf<HTMLElement>;
+    for (const element of elements) {
+        element.style.display = "none";
+    }
 };

@@ -2,6 +2,7 @@ import { getFromStorage, setStorage } from "../chrome";
 import {
     InvisibleReasons,
     StorageKey,
+    attributeName,
     decodeUserDataList,
     encodeUserDataList,
 } from "../domains";
@@ -10,6 +11,7 @@ import {
     getTweetInfos,
     getTweets,
     getUserId,
+    hideUser,
     isDisablePage,
     isPromotionTweet,
 } from "./domController";
@@ -26,6 +28,9 @@ import {
 } from "./filters";
 
 let tweetCount = 0;
+let focussedTweet: HTMLElement | null = null;
+let focussedTweetUserId: string | undefined = undefined;
+let path = "";
 
 async function observerFunc() {
     // 非表示処理をしないページはスキップ
@@ -42,14 +47,30 @@ async function observerFunc() {
     tweetCount = tweets.length;
     if (tweetCount <= 0) return;
 
+    await Promise.all(
+        tweets.map(async (tweet) => {
+            const userId = await getUserId(tweet);
+            if (userId) tweet.setAttribute(attributeName, userId);
+        }),
+    );
+
     // 同一の文のツイートか判断するため本文を保持する配列を用意
     const tweetTextList: string[] = [];
     // statusページ特有の情報を取得する
-    const { isStatusPage, focussedTweet, focussedTweetUserId } =
-        await getStatusPageInfos();
+    const {
+        isStatusPage,
+        focussedTweet: newFocussedTweet,
+        focussedTweetUserId: newFocussedTweetUserId,
+    } = await getStatusPageInfos();
+    if (path !== window.location.pathname) {
+        focussedTweet = newFocussedTweet;
+        focussedTweetUserId = newFocussedTweetUserId;
+    }
     let isAfterFocusedTweet =
         !isStatusPage || !(focussedTweet && tweets.includes(focussedTweet));
     const replyUserIdList: string[] = [];
+
+    path = window.location.pathname;
 
     // 各TweetのDOMから非表示にすべきか判定
     await Promise.all(
@@ -69,7 +90,10 @@ async function observerFunc() {
             // ページの対象のツイート主がリプライ欄にいるとき、非表示対象にしない
             if (userId === focussedTweetUserId) return;
             // 非表示に追加済であればスキップ
-            if (Object.keys(invisibleUsers).includes(userId)) return;
+            if (Object.keys(invisibleUsers).includes(userId)) {
+                hideUser(userId);
+                return;
+            }
 
             // TODO: OKワードの実装
 
@@ -89,6 +113,7 @@ async function observerFunc() {
                     userInfos,
                     InvisibleReasons.TooManyEmoji,
                 );
+                hideUser(userId);
                 return;
             }
             // コピペツイート
@@ -98,6 +123,7 @@ async function observerFunc() {
                     userInfos,
                     InvisibleReasons.Parroting,
                 );
+                hideUser(userId);
                 return;
             }
             // NGワードを含むツイート
@@ -107,6 +133,7 @@ async function observerFunc() {
                     userInfos,
                     InvisibleReasons.NgWordTweet,
                 );
+                hideUser(userId);
                 return;
             }
             // NGワードを含むユーザ名
@@ -116,6 +143,7 @@ async function observerFunc() {
                     userInfos,
                     InvisibleReasons.NgWordUserName,
                 );
+                hideUser(userId);
                 return;
             }
             // TODO: ハッシュタグのレート値の調整機能
@@ -126,6 +154,7 @@ async function observerFunc() {
                     userInfos,
                     InvisibleReasons.TooManyHashtag,
                 );
+                hideUser(userId);
                 return;
             }
             // TODO: └(՞ةڼ◔)」など絵文字の誤検知の対応
@@ -136,6 +165,7 @@ async function observerFunc() {
                     userInfos,
                     InvisibleReasons.Devanagari,
                 );
+                hideUser(userId);
                 return;
             }
             // アラビア文字
@@ -145,6 +175,7 @@ async function observerFunc() {
                     userInfos,
                     InvisibleReasons.Arabian,
                 );
+                hideUser(userId);
                 return;
             }
 
@@ -156,6 +187,7 @@ async function observerFunc() {
                         userInfos,
                         InvisibleReasons.ContinuousTweet,
                     );
+                    hideUser(userId);
                     return;
                 }
             }
@@ -163,15 +195,6 @@ async function observerFunc() {
             // TODO: 悪意のある引用リツイートを弾く
             // TODO: ユーザ説明文のNGワード
             // TODO: アンカーリンクのNGワード
-        }),
-    );
-
-    // 非表示対象のツイートを非表示にする
-    await Promise.all(
-        tweets.map(async (tweet) => {
-            const userId = await getUserId(tweet);
-            if (userId && Object.keys(invisibleUsers).includes(userId))
-                tweet.style.display = "none";
         }),
     );
 

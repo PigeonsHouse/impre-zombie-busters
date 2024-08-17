@@ -26,6 +26,7 @@ const NgWordEditor: React.FC<NgWordEditorProps> = ({
       <Title>{title}</Title>
       <InputBox value={ngWords} onChange={onChangeNgWords} />
       <ButtonWrapper>
+        {/* TODO: 押したことをわかりやすくする */}
         <Button onClick={saveNgWords}>保存</Button>
       </ButtonWrapper>
     </Container>

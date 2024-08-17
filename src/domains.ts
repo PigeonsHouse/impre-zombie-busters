@@ -1,3 +1,5 @@
+export const attributeName = "impre-zombie-busters";
+
 // chrome.storageのkey
 export const APP_NAME_KEY = "impre-zombie-busters";
 
