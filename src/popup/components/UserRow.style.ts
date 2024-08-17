@@ -28,6 +28,20 @@ export const Avatar = styled.img`
   border-radius: 30px;
 `;
 
+export const AltAvatar = styled.div`
+  width: 30px;
+  height: 30px;
+  border-radius: 30px;
+  background-color: white;
+  flex-shrink: 0;
+  display: flex;
+  align-item: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: #ddd;
+`;
+
 export const Username = styled.div`
   font-weight: bold;
 `;
@@ -47,6 +61,7 @@ export const RemoveButton = styled.div`
   width: 20px;
   text-align: center;
   border-radius: 20px;
+  flex-shrink: 0;
 `;
 
 export const UserRowBottom = styled.div`

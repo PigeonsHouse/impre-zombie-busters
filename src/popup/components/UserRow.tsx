@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { openUrl } from "../../chrome";
 import { InvisibleReasons, type UserData } from "../../domains";
 import {
+  AltAvatar,
   Avatar,
   RemoveButton,
   TweetLink,
@@ -58,7 +59,11 @@ const UserRow: React.FC<UserRowProps> = ({ id, userData, removeUser }) => {
     <UserRowContainer>
       <UserRowTop>
         <UserInfo>
-          <Avatar src={userData.avatar} alt="" />
+          {userData.avatar ? (
+            <Avatar src={userData.avatar} alt="" />
+          ) : (
+            <AltAvatar>?</AltAvatar>
+          )}
           <Username>{userData.name}</Username>
           <UserId onClick={jumpUserPage}>{id}</UserId>
         </UserInfo>

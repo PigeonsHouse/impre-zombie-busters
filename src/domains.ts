@@ -28,7 +28,7 @@ export type InvisibleReasons =
 export type UserData = {
     name: string;
     contentId: string;
-    avatar: string;
+    avatar?: string;
     reason: InvisibleReasons;
 };
 
@@ -64,6 +64,8 @@ export const decodeUserDataList = (
         if (singleUserData === "") continue;
         const singleUserDatum = singleUserData.split("\n");
         const id = singleUserDatum[0];
+        const avatar =
+            singleUserDatum[3] === "undefined" ? undefined : singleUserDatum[3];
         const reasonNumber = Number(singleUserDatum[4]);
         let reason: InvisibleReasons = InvisibleReasons.Unknown;
         for (const value of Object.values(InvisibleReasons)) {
@@ -76,7 +78,7 @@ export const decodeUserDataList = (
         decodedData[id] = {
             name: singleUserDatum[1],
             contentId: singleUserDatum[2],
-            avatar: singleUserDatum[3],
+            avatar,
             reason,
         };
     }

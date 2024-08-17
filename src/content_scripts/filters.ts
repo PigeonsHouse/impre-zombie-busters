@@ -83,7 +83,7 @@ export const arabianFilter = (userName: string, tweetText: string) => {
 type UserInfos = {
     userId: string;
     userName: string;
-    avatar: string;
+    avatar?: string;
     contentId: string;
 };
 
