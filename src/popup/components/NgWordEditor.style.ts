@@ -24,9 +24,21 @@ export const InputBox = styled.textarea`
   }
 `;
 
-export const ButtonWrapper = styled.div`
+export const EditorBottom = styled.div`
   display: flex;
   justify-content: flex-end;
+`;
+
+export const ButtonWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`;
+
+export const Message = styled.div`
+  font-size: 0.9em;
+  color: #0a2;
+  font-weight: bold;
 `;
 
 export const Button = styled.div`
