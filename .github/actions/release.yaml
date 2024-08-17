@@ -1,0 +1,68 @@
+name: Release Chrome Extension
+
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+        cache: npm
+
+    - name: Install library
+      run: npm ci
+
+    - name: Build
+      run: npm run build
+
+    - name: Clean
+      run: rm -r dist/.vite/ dist/icon*.png
+
+    - name: Create release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: '@${{ github.sha }}'
+        release_name: ImpreZombieBusters@${{ github.sha }}
+        body: ImpreZombieBusters nightly @${{ github.sha }}
+        draft: false
+        prerelease: false
+
+    - name: Zip
+      run: |
+        tar -cvzf dist.tar.gz dist/
+        cd dist
+        zip -r ../dist.zip *
+        cd ..
+
+    - name: Release dist tgz
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist.tar.gz
+        asset_name: extension.tar.gz
+        asset_content_type: application/gzip
+
+    - name: Release dist zip
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist.zip
+        asset_name: extension.zip
+        asset_content_type: application/zip
